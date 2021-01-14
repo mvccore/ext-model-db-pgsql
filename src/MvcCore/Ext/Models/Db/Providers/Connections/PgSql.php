@@ -15,7 +15,26 @@ namespace MvcCore\Ext\Models\Db\Providers\Connections;
 
 class PgSql 
 extends \MvcCore\Ext\Models\Db\Connection
-implements	\MvcCore\Ext\Models\Db\Model\IConstants {
+implements	\MvcCore\Ext\Models\Db\Model\IConstants,
+			\MvcCore\Ext\Models\Db\Models\PgSqls\IConstants {
+	
+	/**
+	 * `TRUE` for SQL `READ WRITE` or `READ ONLY` start transaction property support.
+	 * @var bool|NULL
+	 */
+	protected $transReadWriteSupport = NULL;
+
+	/**
+	 * `TRUE` for SQL `REPEATABLE READ` or `READ UNCOMMITTED` start transaction property support.
+	 * @var bool|NULL
+	 */
+	protected $transAllIsolationsSupport = NULL;
+	
+	/**
+	 * `TRUE` for SQL `[NOT] DEFERRABLE` start transaction property support.
+	 * @var bool|NULL
+	 */
+	protected $transDeferrableSupport = NULL;
 
 	/**
 	 * @inheritDocs
@@ -37,12 +56,6 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants {
 	public function BeginTransaction ($flags = 0, $name = NULL) {
 		if ($flags === 0) $flags = self::TRANS_READ_WRITE;
 
-		$transRepeatableRead = ($flags & self::TRANS_ISOLATION_REPEATABLE_READ) > 0;
-		$consistentSnapshot = (
-			$transRepeatableRead &&
-			($flags & self::TRANS_CONSISTENT_SHAPSHOT) > 0
-		);
-
 		$readWrite = NULL;
 		if (($flags & self::TRANS_READ_WRITE) > 0) {
 			$readWrite = TRUE;
@@ -61,39 +74,47 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants {
 
 		$sqlItems = [];
 
-		$startTransPropsSeparator = '';
-		$snapshotStr = '';
-		$writeStr = '';
+		$isolationLevel = '';
+		$readWrite = '';
+		$deferrable = '';
 		
 		if ($consistentSnapshot) 
 			$snapshotStr = ' WITH CONSISTENT SNAPSHOT';
-
+		
 		if ($this->transReadWriteSupport) {
 			if ($readWrite === TRUE) {
-				if ($this->autocommit) {
-					$this->autocommit = FALSE;
-					$sqlItems[] = 'SET SESSION autocommit = 0;';
-				}
-				$writeStr = ' READ WRITE';
-				if ($consistentSnapshot)
-					$startTransPropsSeparator = ',';
+				$readWrite = ' READ WRITE';
 			} else if ($readWrite === FALSE) {
-				$writeStr = ' READ ONLY';
-				if ($consistentSnapshot)
-					$startTransPropsSeparator = ',';
+				$readWrite = ' READ ONLY';
 			}
 		}
 
-		$transStartProperties = implode($startTransPropsSeparator, [$snapshotStr, $writeStr]);
+		if (
+			$this->transAllIsolationsSupport && 
+			($flags & self::TRANS_ISOLATION_REPEATABLE_READ) > 0
+		) {
+			$isolationLevel = ' ISOLATION LEVEL REPEATABLE READ';
+		} else if (
+			($flags & self::TRANS_ISOLATION_READ_COMMITTED) > 0
+		) {
+			$isolationLevel = ' ISOLATION LEVEL READ COMMITTED';
+		} else if (
+			$this->transAllIsolationsSupport && 
+			($flags & self::TRANS_ISOLATION_READ_UNCOMMITTED) > 0
+		) {
+			$isolationLevel = ' ISOLATION LEVEL READ UNCOMMITTED';
+		} else if (
+			($flags & self::TRANS_ISOLATION_SERIALIZABLE) > 0
+		) {
+			$isolationLevel = ' ISOLATION LEVEL SERIALIZABLE';
+		}
 
-		if ($transRepeatableRead) {
-			$sqlItems[] = 'SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;';
-		} else if (($flags & self::TRANS_ISOLATION_READ_COMMITTED) > 0) {
-			$sqlItems[] = 'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;';
-		} else if (($flags & self::TRANS_ISOLATION_READ_UNCOMMITTED) > 0) {
-			$sqlItems[] = 'SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;';
-		} else if (($flags & self::TRANS_ISOLATION_SERIALIZABLE) > 0) {
-			$sqlItems[] = 'SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;';
+		if ($this->transDeferrableSupport) {
+			if (($flags & self::TRANS_DEFERRABLE) > 0) {
+				$deferrable = ' DEFERRABLE';
+			} else if (($flags & self::TRANS_NOT_DEFERRABLE) > 0) {
+				$deferrable = ' NOT DEFERRABLE';
+			}
 		}
 
 		if ($name !== NULL) {
@@ -101,17 +122,12 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants {
 			$this->transactionName = $toolClass::GetUnderscoredFromPascalCase($name);
 			$sqlItems[] = "/* trans_start:{$this->transactionName} */";
 		}
-		// examples:"START TRANSACTION WITH CONSISTENT SNAPSHOT, READ WRITE;" or
-		//			"START TRANSACTION READ WRITE;" or
-		//			"START TRANSACTION READ ONLY;" or ...
-		$sqlItems[] = "START TRANSACTION{$transStartProperties};";
 		
-		if ($this->multiStatements) {
-			$this->provider->exec(implode(" \n", $sqlItems));
-		} else {
-			foreach ($sqlItems as $sqlItem)
-				$this->provider->exec($sqlItem);
-		}
+		$sqlItems[] = "START TRANSACTION{$isolationLevel}{$readWrite}{$deferrable};";
+		
+		
+		foreach ($sqlItems as $sqlItem)
+			$this->provider->exec($sqlItem);
 
 		$this->inTransaction = TRUE;
 
@@ -127,40 +143,17 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants {
 	public function Commit ($flags = 0) {
 		if (!$this->inTransaction) return FALSE;
 		$sqlItems = [];
-		$chain = NULL;
-		$chainSql = '';
-
-		if (($flags & self::TRANS_CHAIN) > 0) {
-			$chain = TRUE;
-			$chainSql = ' AND CHAIN';
-		} else if (($flags & self::TRANS_NO_CHAIN) > 0) {
-			$chain = FALSE;
-			$chainSql = ' AND NO CHAIN';
-		}
 
 		if ($this->transactionName !== NULL) 
 			$sqlItems[] = "/* trans_commit:{$this->transactionName} */";
 
-		$sqlItems[] = "COMMIT{$chainSql};";
+		$sqlItems[] = "COMMIT;";
 
-		if (!$chain && !$this->autocommit) {
-			$this->autocommit = TRUE;
-			$sqlItems[] = 'SET SESSION autocommit = 1;';
-		}
-
-		if ($this->multiStatements) {
-			$this->provider->exec(implode(" \n", $sqlItems));
-		} else {
-			foreach ($sqlItems as $sqlItem)
-				$this->provider->exec($sqlItem);
-		}
+		foreach ($sqlItems as $sqlItem)
+			$this->provider->exec($sqlItem);
 		
-		if ($chain) {
-			$this->inTransaction  = TRUE;
-		} else {
-			$this->inTransaction  = FALSE;
-			$this->transactionName = NULL;
-		}
+		$this->inTransaction  = FALSE;
+		$this->transactionName = NULL;
 
 		return TRUE;
 	}
@@ -174,41 +167,18 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants {
 	public function RollBack ($flags = NULL) {
 		if (!$this->inTransaction) return FALSE;
 		$sqlItems = [];
-		$chain = NULL;
-		$chainSql = '';
-
-		if (($flags & self::TRANS_CHAIN) > 0) {
-			$chain = TRUE;
-			$chainSql = ' AND CHAIN';
-		} else if (($flags & self::TRANS_NO_CHAIN) > 0) {
-			$chain = FALSE;
-			$chainSql = ' AND NO CHAIN';
-		}
 
 		if ($this->transactionName !== NULL) 
 			$sqlItems[] = "/* trans_rollback:{$this->transactionName} */";
 
-		$sqlItems[] = "ROLLBACK{$chainSql};";
+		$sqlItems[] = "ROLLBACK;";
 
-		if (!$chain && !$this->autocommit) {
-			$this->autocommit = TRUE;
-			$sqlItems[] = 'SET SESSION autocommit = 1;';
-		}
-
-		if ($this->multiStatements) {
-			$this->provider->exec(implode(" \n", $sqlItems));
-		} else {
-			foreach ($sqlItems as $sqlItem)
-				$this->provider->exec($sqlItem);
-		}
-
-		if ($chain) {
-			$this->inTransaction  = TRUE;
-		} else {
-			$this->inTransaction  = FALSE;
-			$this->transactionName = NULL;
-		}
-
+		foreach ($sqlItems as $sqlItem)
+			$this->provider->exec($sqlItem);
+		
+		$this->inTransaction  = FALSE;
+		$this->transactionName = NULL;
+		
 		return TRUE;
 	}
 
@@ -230,12 +200,15 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants {
 	 */
 	protected function setUpConnectionSpecifics () {
 		parent::setUpConnectionSpecifics();
-		/*
-		$multiStatementsConst = '\PDO::MYSQL_ATTR_MULTI_STATEMENTS';
-		$multiStatementsConstVal = defined($multiStatementsConst) 
-			? constant($multiStatementsConst) 
-			: 0;
-		$this->multiStatements = isset($this->options[$multiStatementsConstVal]);
-		*/
+		
+		$this->transReadWriteSupport = (
+			version_compare($this->version, '7.4', '>=')
+		);
+		$this->transAllIsolationsSupport = (
+			version_compare($this->version, '8.0', '>=')
+		);
+		$this->transDeferrableSupport = (
+			version_compare($this->version, '9.1', '>=')
+		);
 	}
 }
