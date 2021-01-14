@@ -47,8 +47,9 @@ trait Manipulation {
 		
 		$autoIncrColumnName = $conn->QuoteName($autoIncrColumnName);
 		$newIdName = $conn->QuoteName("new_id");
+		// most universal case for any database structure or database engine version:
 		$newIdSelectSql = "SELECT MAX({$autoIncrColumnName}) "
-			. "AS {$newIdName} FROM {$tableName};"
+			. "AS {$newIdName} FROM {$tableName};";
 
 		$success = FALSE;
 		$error = NULL;
@@ -58,7 +59,7 @@ trait Manipulation {
 			$conn->BeginTransaction(16, $transName); // 16 means read write
 
 			$insertReader = $conn
-				->Prepare($sql)
+				->Prepare($insertSql)
 				->Execute($params);
 
 			$success = $insertReader->GetExecResult();
@@ -67,7 +68,7 @@ trait Manipulation {
 			$newId = $conn
 				->Prepare($newIdSelectSql)
 				->FetchOne()
-				->ToScalar('new_id', 'id');
+				->ToScalar('new_id', 'int');
 
 			$conn->Commit();
 
@@ -87,6 +88,4 @@ trait Manipulation {
 			$error
 		];
 	}
-
-	protected function getPrimaryKeyColumn
 }
