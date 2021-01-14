@@ -44,7 +44,6 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 	public function QuoteName ($identifierName) {
 		return '"'.$identifierName.'"';
 	}
-
 	
 	/**
 	 * @inheritDocs
@@ -77,9 +76,6 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 		$isolationLevel = '';
 		$readWrite = '';
 		$deferrable = '';
-		
-		if ($consistentSnapshot) 
-			$snapshotStr = ' WITH CONSISTENT SNAPSHOT';
 		
 		if ($this->transReadWriteSupport) {
 			if ($readWrite === TRUE) {
@@ -126,8 +122,7 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 		$sqlItems[] = "START TRANSACTION{$isolationLevel}{$readWrite}{$deferrable};";
 		
 		
-		foreach ($sqlItems as $sqlItem)
-			$this->provider->exec($sqlItem);
+		$this->provider->exec(implode("\n", $sqlItems));
 
 		$this->inTransaction = TRUE;
 
@@ -148,9 +143,8 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 			$sqlItems[] = "/* trans_commit:{$this->transactionName} */";
 
 		$sqlItems[] = "COMMIT;";
-
-		foreach ($sqlItems as $sqlItem)
-			$this->provider->exec($sqlItem);
+		
+		$this->provider->exec(implode("\n", $sqlItems));
 		
 		$this->inTransaction  = FALSE;
 		$this->transactionName = NULL;
@@ -173,8 +167,7 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 
 		$sqlItems[] = "ROLLBACK;";
 
-		foreach ($sqlItems as $sqlItem)
-			$this->provider->exec($sqlItem);
+		$this->provider->exec(implode("\n", $sqlItems));
 		
 		$this->inTransaction  = FALSE;
 		$this->transactionName = NULL;

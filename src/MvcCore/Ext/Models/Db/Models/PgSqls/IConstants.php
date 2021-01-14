@@ -20,10 +20,11 @@ interface IConstants {
 	
 	/** @var int */
 	const TRANS_READ_ONLY			= 32;
+
 	
 	/** @var int */
-	const TRANS_DEFERRABLE			= 64;
+	const TRANS_DEFERRABLE			= 256;
 	
 	/** @var int */
-	const TRANS_NOT_DEFERRABLE		= 128;
+	const TRANS_NOT_DEFERRABLE		= 512;
 }

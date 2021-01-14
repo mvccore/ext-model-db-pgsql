@@ -28,5 +28,8 @@ implements	\MvcCore\Model\IConstants,
 	
 	use \MvcCore\Ext\Models\Db\Models\PgSqls\ProviderResource;
 	
-	use \MvcCore\Ext\Models\Db\Providers\Resources\Manipulation;
+	use \MvcCore\Ext\Models\Db\Providers\Resources\Manipulation,
+		\MvcCore\Ext\Models\Db\Providers\Resources\PgSqls\Manipulation {
+			\MvcCore\Ext\Models\Db\Providers\Resources\PgSqls\Manipulation::Insert insteadof \MvcCore\Ext\Models\Db\Providers\Resources\Manipulation;
+	}
 }
