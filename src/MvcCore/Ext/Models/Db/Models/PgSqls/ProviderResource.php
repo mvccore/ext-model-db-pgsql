@@ -16,6 +16,12 @@ namespace MvcCore\Ext\Models\Db\Models\PgSqls;
 trait ProviderResource {
 	
 	/**
+	 * Provider specific driver name.
+	 * @var string|NULL
+	 */
+	protected static $providerDriverName = 'pgsql';
+
+	/**
 	 * Connection class full name, specific for each extension.
 	 * @var string
 	 */
