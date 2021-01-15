@@ -7,14 +7,14 @@
  * For the full copyright and license information, please view
  * the LICENSE.md file that are distributed with this source code.
  *
- * @copyright	Copyright (c) 2016 Tom Flídr (https://github.com/mvccore/mvccore)
+ * @copyright	Copyright (c) 2016 Tom Flidr (https://github.com/mvccore)
  * @license  https://mvccore.github.io/docs/mvccore/5.0.0/LICENCE.md
  */
 
 namespace MvcCore\Ext\Models\Db\Providers\Connections;
 
-class PgSql 
-extends \MvcCore\Ext\Models\Db\Connection
+class		PgSql 
+extends		\MvcCore\Ext\Models\Db\Connection
 implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 			\MvcCore\Ext\Models\Db\Models\PgSqls\IConstants {
 	
