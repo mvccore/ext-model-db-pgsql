@@ -1,19 +1,19 @@
 {
 	"name": "mvccore/ext-model-db-pgsql",
 	"type": "library",
-	"description": "MvcCore - Extension - Model - Database - extension to work with Postgres SQL queries in more comfortable API.",
+	"description": "MvcCore - Extension - Model - Database - Postgre SQL - extension to work with Postgres SQL queries in more comfortable API.",
 	"keywords": [
-		"mvc", 
-		"mvccore", 
-		"framework", 
-		"extension", 
-		"plugin", 
-		"plug-in", 
-		"ext", 
-		"model", 
-		"db", 
-		"database", 
-		"postgres", 
+		"mvc",
+		"mvccore",
+		"framework",
+		"extension",
+		"plugin",
+		"plug-in",
+		"ext",
+		"model",
+		"db",
+		"database",
+		"postgres",
 		"pgsql"
 	],
 	"license": ["BSD-3-Clause"],
@@ -23,14 +23,16 @@
 	}],
 	"require": {
 		"php": ">=5.4.0",
-		"mvccore/mvccore": "dev-master",
-		"mvccore/ext-model-db": "dev-master"
+		"mvccore/mvccore": "^5.0",
+		"mvccore/ext-model-db": "^5.0"
 	},
 	"suggest": {
 		"mvccore/ext-cache-*": "MvcCore cache extensions to speed up operations driven by class anotations."
 	},
 	"autoload": {
-		"classmap": ["src/"]
+		"classmap": [
+			"src/"
+		]
 	},
 	"minimum-stability": "dev"
 }
