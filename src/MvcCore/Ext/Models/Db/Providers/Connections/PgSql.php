@@ -38,7 +38,7 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 
 	/**
 	 * @inheritDocs
-	 * @param string $identifierName
+	 * @param  string $identifierName
 	 * @return string
 	 */
 	public function QuoteName ($identifierName) {
@@ -52,8 +52,8 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 	
 	/**
 	 * @inheritDocs
-	 * @param int $flags Transaction isolation, read/write mode and consistent snapshot option.
-	 * @param string $name String without spaces to identify transaction in logs.
+	 * @param  int    $flags Transaction isolation, read/write mode and consistent snapshot option.
+	 * @param  string $name  String without spaces to identify transaction in logs.
 	 * @throws \PDOException|\RuntimeException
 	 * @return bool
 	 */
@@ -136,7 +136,7 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 
 	/**
 	 * @inheritDocs
-	 * @param int $flags Transaction chaininig.
+	 * @param  int $flags Transaction chaininig.
 	 * @throws \PDOException
 	 * @return bool
 	 */
@@ -159,7 +159,7 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 
 	/**
 	 * Rolls back a transaction.
-	 * @param int $flags Transaction chaininig.
+	 * @param  int $flags Transaction chaininig.
 	 * @throws \PDOException
 	 * @return bool
 	 */
@@ -185,7 +185,7 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 	/**
 	 * @inheritDocs
 	 * @see https://stackoverflow.com/questions/7942154/mysql-error-2006-mysql-server-has-gone-away
-	 * @param \Throwable $e 
+	 * @param  \Throwable $e 
 	 * @return bool
 	 */
 	protected function isConnectionLost (\Throwable $e) {
