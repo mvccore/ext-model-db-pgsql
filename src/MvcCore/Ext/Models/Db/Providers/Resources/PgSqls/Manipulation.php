@@ -56,7 +56,7 @@ trait Manipulation {
 
 		$transName = 'INSERT:'.str_replace('\\', '_', $className);
 		try {
-			$conn->BeginTransaction(16, $transName); // 16 means read write
+			$conn->BeginTransaction(8 | 16, $transName); // 8 means serializable, 16 means read write
 
 			$insertReader = $conn
 				->Prepare($insertSql)
