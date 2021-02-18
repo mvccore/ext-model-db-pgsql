@@ -17,14 +17,14 @@ trait Manipulation {
 
 	/**
 	 * Execute SQL code to insert new database table row in transaction, in default database isolation.
-	 * @param  int|string $connNameOrIndex    Connection name or index in system config.
-	 * @param  string     $tableName          Database table name.
-	 * @param  array      $dataColumns        Data to use in insert clause, keys are 
-	 *                                        column names, values are column values.
-	 * @param  string     $className          model class full name.
-	 * @param  string     $autoIncrColumnName Auto increment column name.
-	 * @return array                          First item is boolean result, 
-	 *                                        second is affected rows count. 
+	 * @param  int|string  $connNameOrIndex    Connection name or index in system config.
+	 * @param  string      $tableName          Database table name.
+	 * @param  array       $dataColumns        Data to use in insert clause, keys are 
+	 *                                         column names, values are column values.
+	 * @param  string      $className          model class full name.
+	 * @param  string|NULL $autoIncrColumnName Auto increment column name.
+	 * @return array                           First item is boolean result, 
+	 *                                         second is affected rows count. 
 	 */
 	public function Insert ($connNameOrIndex, $tableName, $dataColumns, $className, $autoIncrColumnName) {
 		$sqlItems = [];
@@ -45,13 +45,16 @@ trait Manipulation {
 			. implode(", ", array_keys($params)) 
 			. ");";
 		
-		$autoIncrColumnName = $conn->QuoteName($autoIncrColumnName);
-		$newIdName = $conn->QuoteName("new_id");
-		// most universal case for any database structure or database engine version:
-		$newIdSelectSql = "SELECT MAX({$autoIncrColumnName}) "
-			. "AS {$newIdName} FROM {$tableName};";
+		if ($autoIncrColumnName !== NULL) {
+			$autoIncrColumnName = $conn->QuoteName($autoIncrColumnName);
+			$newIdName = $conn->QuoteName("new_id");
+			// most universal case for any database structure or database engine version:
+			$newIdSelectSql = "SELECT MAX({$autoIncrColumnName}) "
+				. "AS {$newIdName} FROM {$tableName};";
+		}
 
 		$success = FALSE;
+		$newId = NULL;
 		$error = NULL;
 
 		$transName = 'INSERT:'.str_replace('\\', '_', $className);
@@ -65,10 +68,11 @@ trait Manipulation {
 			$success = $insertReader->GetExecResult();
 			$affectedRows = $insertReader->GetRowsCount();
 
-			$newId = $conn
-				->Prepare($newIdSelectSql)
-				->FetchOne()
-				->ToScalar('new_id', 'int');
+			if ($autoIncrColumnName !== NULL)
+				$newId = $conn
+					->Prepare($newIdSelectSql)
+					->FetchOne()
+					->ToScalar('new_id', 'int');
 
 			$conn->Commit();
 
