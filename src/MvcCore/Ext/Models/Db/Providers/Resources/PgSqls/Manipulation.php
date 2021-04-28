@@ -13,6 +13,9 @@
 
 namespace MvcCore\Ext\Models\Db\Providers\Resources\PgSqls;
 
+/**
+ * @mixin \MvcCore\Ext\Models\Db\Providers\Resources\PgSql
+ */
 trait Manipulation {
 
 	/**

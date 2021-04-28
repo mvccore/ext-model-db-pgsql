@@ -13,6 +13,9 @@
 
 namespace MvcCore\Ext\Models\Db\Models\PgSqls;
 
+/**
+ * @mixin \MvcCore\Ext\Models\Db\Models\PgSqls\Features
+ */
 trait ProviderResource {
 	
 	/**
