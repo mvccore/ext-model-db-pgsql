@@ -22,7 +22,6 @@ implements	\MvcCore\IModel,
 	use \MvcCore\Model\Props;
 	use \MvcCore\Model\Config;
 	use \MvcCore\Model\Resource;
-	use \MvcCore\Model\MagicMethods;
 	use \MvcCore\Model\Converters;
 	use \MvcCore\Model\Comparers;
 
@@ -33,6 +32,6 @@ implements	\MvcCore\IModel,
 	 * Comparison by PHP function version_compare();
 	 * @see http://php.net/manual/en/function.version-compare.php
 	 */
-	const VERSION = '5.0.5';
+	const VERSION = '5.0.6';
 
 }
