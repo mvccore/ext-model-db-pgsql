@@ -72,7 +72,7 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 			unset($cfg['password']);
 			$toolClass = \MvcCore\Application::GetInstance()->GetToolClass();
 			throw new \RuntimeException(
-				'Connection has opened transaction already ('.($toolClass::EncodeJson($cfg)).').'
+				'Connection has opened transaction already ('.($toolClass::JsonEncode($cfg)).').'
 			);
 		}
 
