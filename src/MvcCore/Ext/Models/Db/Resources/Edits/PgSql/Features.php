@@ -11,12 +11,12 @@
  * @license		https://mvccore.github.io/docs/mvccore/5.0.0/LICENSE.md
  */
 
-namespace MvcCore\Ext\Models\Db\Providers\Resources\PgSqls;
+namespace MvcCore\Ext\Models\Db\Resources\Edits\PgSql;
 
 /**
- * @mixin \MvcCore\Ext\Models\Db\Providers\Resources\PgSql
+ * @mixin \MvcCore\Ext\Models\Db\Resources\Edits\PgSql
  */
-trait Manipulation {
+trait Features {
 
 	/**
 	 * Execute SQL code to insert new database table row in transaction, in default database isolation.

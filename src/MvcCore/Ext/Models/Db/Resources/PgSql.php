@@ -11,20 +11,11 @@
  * @license		https://mvccore.github.io/docs/mvccore/5.0.0/LICENSE.md
  */
 
-namespace MvcCore\Ext\Models\Db\Models\PgSqls;
+namespace MvcCore\Ext\Models\Db\Resources;
 
-interface IConstants {
-
-	/** @var int */
-	const TRANS_READ_WRITE			= 16;
+class		PgSql
+implements	\MvcCore\Model\IConstants,
+			\MvcCore\Ext\Models\Db\Model\IConstants {
 	
-	/** @var int */
-	const TRANS_READ_ONLY			= 32;
-
-	
-	/** @var int */
-	const TRANS_DEFERRABLE			= 256;
-	
-	/** @var int */
-	const TRANS_NOT_DEFERRABLE		= 512;
+	use \MvcCore\Ext\Models\Db\Resources\PgSql\Features;
 }

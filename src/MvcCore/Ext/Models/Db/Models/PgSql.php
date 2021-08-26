@@ -17,15 +17,10 @@ class		PgSql
 implements	\MvcCore\IModel,
 			\MvcCore\Ext\Models\Db\IModel,
 			\MvcCore\Ext\Models\Db\Model\IConstants,
-			\MvcCore\Ext\Models\Db\Models\PgSqls\IConstants {
+			\MvcCore\Ext\Models\Db\Models\PgSql\IConstants,
+			\JsonSerializable {
 	
-	use \MvcCore\Model\Props;
-	use \MvcCore\Model\Config;
-	use \MvcCore\Model\Resource;
-	use \MvcCore\Model\Converters;
-	use \MvcCore\Model\Comparers;
-
-	use \MvcCore\Ext\Models\Db\Models\PgSqls\Features;
+	use \MvcCore\Ext\Models\Db\Models\PgSql\Features;
 
 	/**
 	 * MvcCore Extension - Model - Db - version:

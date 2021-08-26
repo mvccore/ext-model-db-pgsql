@@ -24,7 +24,7 @@
 	"require": {
 		"php": ">=5.4.0",
 		"mvccore/mvccore": "^5.1",
-		"mvccore/ext-model-db": "^5.0.15"
+		"mvccore/ext-model-db": "^5.1.4"
 	},
 	"suggest": {
 		"mvccore/ext-cache-*": "MvcCore cache extensions to speed up operations driven by class anotations."

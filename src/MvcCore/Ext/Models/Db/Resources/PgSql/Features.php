@@ -11,34 +11,24 @@
  * @license		https://mvccore.github.io/docs/mvccore/5.0.0/LICENSE.md
  */
 
-namespace MvcCore\Ext\Models\Db\Models\PgSqls;
+namespace MvcCore\Ext\Models\Db\Resources\PgSql;
 
+/**
+ * @mixin \MvcCore\Ext\Models\Db\Resources\PgSql
+ */
 trait Features {
-
-	use \MvcCore\Ext\Models\Db\Model\Props;
-	use \MvcCore\Ext\Models\Db\Model\DataMethods;
-	use \MvcCore\Ext\Models\Db\Model\Manipulation;
 	
-	use \MvcCore\Model\MagicMethods,
-		\MvcCore\Ext\Models\Db\Model\MagicMethods {
-			\MvcCore\Ext\Models\Db\Model\MagicMethods::jsonSerialize insteadof \MvcCore\Model\MagicMethods;
-			\MvcCore\Model\MagicMethods::jsonSerialize as jsonSerializeBase;
-		}
-
+	use \MvcCore\Model\Comparers;
+	use \MvcCore\Model\Config;
+	use \MvcCore\Model\Converters;
+	use \MvcCore\Model\Props;
+	
 	use \MvcCore\Model\Connection, 
 		\MvcCore\Ext\Models\Db\Model\Connection {
 			\MvcCore\Ext\Models\Db\Model\Connection::GetConnection insteadof \MvcCore\Model\Connection;
 			\MvcCore\Model\Connection::GetConnection as GetProviderConnection;
 		}
 
-	use \MvcCore\Model\MetaData,
-		\MvcCore\Ext\Models\Db\Model\MetaData {
-			\MvcCore\Ext\Models\Db\Model\MetaData::GetMetaData insteadof \MvcCore\Model\MetaData;
-			\MvcCore\Ext\Models\Db\Model\MetaData::parseMetaData insteadof \MvcCore\Model\MetaData;
-			\MvcCore\Ext\Models\Db\Model\MetaData::parseMetaDataProperty insteadof \MvcCore\Model\MetaData;
-			\MvcCore\Model\MetaData::parseMetaDataProperty as parseMetaDataPropertyBase;
-	}
-	
 	use \MvcCore\Model\Parsers,
 		\MvcCore\Ext\Models\Db\Model\Parsers {
 			\MvcCore\Ext\Models\Db\Model\Parsers::parseToTypes insteadof \MvcCore\Model\Parsers;
@@ -47,5 +37,5 @@ trait Features {
 			\MvcCore\Model\Parsers::parseToDateTime as parseToDateTimeDefault;
 	}
 	
-	use \MvcCore\Ext\Models\Db\Models\PgSqls\ProviderResource;
+	use \MvcCore\Ext\Models\Db\Models\PgSql\Provider;
 }
