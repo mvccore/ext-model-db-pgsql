@@ -17,8 +17,7 @@ namespace MvcCore\Ext\Models\Db\Models\PgSql;
  * @mixin \MvcCore\Ext\Models\Db\Models\PgSql
  */
 trait Features {
-		
-	use \MvcCore\Model\CommonResource;
+	
 	use \MvcCore\Model\Comparers;
 	use \MvcCore\Model\Config;
 	use \MvcCore\Model\Converters;
@@ -46,6 +45,14 @@ trait Features {
 			\MvcCore\Ext\Models\Db\Model\MetaData::parseMetaData insteadof \MvcCore\Model\MetaData;
 			\MvcCore\Ext\Models\Db\Model\MetaData::parseMetaDataProperty insteadof \MvcCore\Model\MetaData;
 			\MvcCore\Model\MetaData::parseMetaDataProperty as parseMetaDataPropertyBase;
+	}
+	
+	use \MvcCore\Model\Resources,
+		\MvcCore\Ext\Models\Db\Model\Resources {
+			\MvcCore\Ext\Models\Db\Model\Resources::GetCommonResource insteadof \MvcCore\Model\Resources;
+			\MvcCore\Ext\Models\Db\Model\Resources::GetResource insteadof \MvcCore\Model\Resources;
+			\MvcCore\Model\Resources::GetCommonResource as GetCommonResourceParent;
+			\MvcCore\Model\Resources::GetResource as GetResourceParent;
 	}
 	
 	use \MvcCore\Model\Parsers,
