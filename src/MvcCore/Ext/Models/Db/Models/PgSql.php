@@ -27,6 +27,6 @@ implements	\MvcCore\IModel,
 	 * Comparison by PHP function version_compare();
 	 * @see http://php.net/manual/en/function.version-compare.php
 	 */
-	const VERSION = '5.1.0';
+	const VERSION = '5.1.1';
 
 }
