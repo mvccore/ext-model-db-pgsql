@@ -14,7 +14,7 @@
 namespace MvcCore\Ext\Models\Db\Resources\Edits;
 
 class		PgSql
-extends		\MvcCore\Ext\Models\Db\Resource
+extends		\MvcCore\Ext\Models\Db\Resources\PgSql
 implements	\MvcCore\Ext\Models\Db\Resources\IEdit {
 	
 	use \MvcCore\Ext\Models\Db\Resource\Features;
