@@ -69,7 +69,7 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 
 		if ($this->inTransaction) {
 			$cfg = $this->GetConfig();
-			unset($cfg['password']);
+			unset($cfg->password);
 			$toolClass = \MvcCore\Application::GetInstance()->GetToolClass();
 			throw new \RuntimeException(
 				'Connection has opened transaction already ('.($toolClass::JsonEncode($cfg)).').'
