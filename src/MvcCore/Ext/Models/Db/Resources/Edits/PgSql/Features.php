@@ -60,7 +60,7 @@ trait Features {
 		$newId = NULL;
 		$error = NULL;
 
-		$transName = 'INSERT:'.str_replace('\\', '_', $className);
+		$transName = 'insert_'.str_replace('\\', '_', $className);
 		try {
 			$conn->BeginTransaction(8 | 16, $transName); // 8 means serializable, 16 means read write
 
