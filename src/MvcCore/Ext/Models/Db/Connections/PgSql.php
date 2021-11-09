@@ -118,14 +118,15 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 			}
 		}
 
-		if ($name !== NULL) {
+		if ($name === NULL) {
+			$this->transactionName = 'pgsql_tran_' . str_replace('.', '', uniqid('', TRUE));
+		} else {
 			$toolClass = \MvcCore\Application::GetInstance()->GetToolClass();
 			$this->transactionName = $toolClass::GetUnderscoredFromPascalCase($name);
-			$sqlItems[] = "/* trans_start:{$this->transactionName} */";
 		}
+		$sqlItems[] = "/* trans_start:{$this->transactionName} */";
 		
 		$sqlItems[] = "START TRANSACTION{$isolationLevel}{$readWrite}{$deferrable};";
-		
 		
 		$this->provider->exec(implode("\n", $sqlItems));
 
@@ -144,13 +145,19 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 		if (!$this->inTransaction) return FALSE;
 		$sqlItems = [];
 
-		if ($this->transactionName !== NULL) 
-			$sqlItems[] = "/* trans_commit:{$this->transactionName} */";
-
+		$sqlItems[] = "/* trans_commit:{$this->transactionName} */";
 		$sqlItems[] = "COMMIT;";
 		
+		$debugging = $this->debugger !== NULL;
+		if ($debugging) $reqTime = microtime(TRUE);
+
 		$this->provider->exec(implode("\n", $sqlItems));
 		
+		if ($debugging) 
+			$this->debugger->AddQuery(
+				implode("\n", $sqlItems), [], $reqTime, microtime(TRUE), $this
+			);
+
 		$this->inTransaction  = FALSE;
 		$this->transactionName = NULL;
 
@@ -167,13 +174,19 @@ implements	\MvcCore\Ext\Models\Db\Model\IConstants,
 		if (!$this->inTransaction) return FALSE;
 		$sqlItems = [];
 
-		if ($this->transactionName !== NULL) 
-			$sqlItems[] = "/* trans_rollback:{$this->transactionName} */";
-
+		$sqlItems[] = "/* trans_rollback:{$this->transactionName} */";
 		$sqlItems[] = "ROLLBACK;";
+		
+		$debugging = $this->debugger !== NULL;
+		if ($debugging) $reqTime = microtime(TRUE);
 
 		$this->provider->exec(implode("\n", $sqlItems));
 		
+		if ($debugging) 
+			$this->debugger->AddQuery(
+				implode("\n", $sqlItems), [], $reqTime, microtime(TRUE), $this
+			);
+
 		$this->inTransaction  = FALSE;
 		$this->transactionName = NULL;
 		
