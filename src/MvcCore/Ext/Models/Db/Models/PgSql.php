@@ -13,6 +13,7 @@
 
 namespace MvcCore\Ext\Models\Db\Models;
 
+#[\AllowDynamicProperties]
 class		PgSql
 implements	\MvcCore\IModel,
 			\MvcCore\Ext\Models\Db\IModel,
